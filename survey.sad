@@ -2,26 +2,33 @@ FFS;
 
 !==================================================================================
 (* HER *)
-RingID="HER";
-latticeFileName="sher_2021-06-16_1.0A_1x60_nb_1576_cw_40.sad";
-GetMAIN[latticeFileName];
-USE ASCE;
-ORG IP 0, 0, 0, -0.0415/Degree, 0, 0; ! if it is defined in the same orientation as LER.
+!RingID="HER";
+!latticeFileName="sher_2021-06-16_1.0A_1x60_nb_1576_cw_40.sad";
+!GetMAIN[latticeFileName];
+!USE ASCE;
+!ORG IP 0, 0, 0, -0.0415/Degree, 0, 0; ! if it is defined in the same orientation as LER.
 
 !==================================================================================
 (* LER *)
-!RingID="LER";
-!latticeFileName="sler_2021-06-16_1.2A_1x80_nb_1576_cw_80.sad";
-!GetMAIN[latticeFileName];
-!USE ASC;
-!ORG IP 0, 0, 0, 0.0415/Degree, 0, 0;
+RingID="LER";
+latticeFileName="sler_2021-06-16_1.2A_1x80_nb_1576_cw_80.sad";
+GetMAIN[latticeFileName];
+USE ASC;
+ORG IP 0, 0, 0, 0.0415/Degree, 0, 0;
 !==================================================================================
 
 CELL;
 CALC;
 
-FFS["RFSW RAD NOFLUC"];
+!====== Start at INJECTIO ======!
+! bl=ExtractBeamLine[BeamLineName[]];
+! p=LINE["POSITION","INJECTIO"];
+! bl=Join[Take[bl,{p,-1}],Take[bl,{1,p-1}]];
+! FFS["USE bl"];
+! FFS["CALC"];
+!===============================!
 
+FFS["RFSW RAD NOFLUC"];
 FFS["INTRA"];
 
 DISP ALL;
@@ -47,7 +54,7 @@ surveyFileName = StringReplace[latticeFileName,".sad"->".survey"];
 Print['\n--> latticeFileName = ',latticeFileName];
 
 f = OpenWrite[surveyFileName];
-Write[f,"NAME S Gx Gy Gz OGx OGy OGz Ax Bx Nx Ex EPx Ay By Ny Ey EPy L Type TypeName Angle K1 Rot Dx Dy"];! header 
+Write[f,"NAME S Gx Gy Gz OGx OGy OGz Ax Bx Nx Ex EPx Ay By Ny Ey EPy L Type TypeName Angle K0 K1 Rot Dx Dy"];! header 
 
 Do[
 	elem = NAME[i];
@@ -74,6 +81,7 @@ Do[
 	TYPEtmp=LINE["TYPE",elem];
 	TYPENAMEtmp=LINE["TYPENAME",elem];
 	ANGLEtmp=LINE["ANGLE",elem];
+	K0tmp=LINE["K0",elem];
 	K1tmp=LINE["K1",elem];
 	ROTATEtmp=LINE["ROTATE",elem];
 	DXtmp=LINE["DX",elem];
@@ -81,8 +89,9 @@ Do[
 
 	StandardForm[PageWidth=500;Write[f,
 		elem,' ',Stmp,' ',GXtmp,' ',GYtmp,' ',GZtmp,' ',OGXtmp,' ',OGYtmp,' ',OGZtmp,' ',
-		AXtmp,' ',BXtmp,' ',NXtmp,' ',EXtmp,' ',EPXtmp,' ',AYtmp,' ',BYtmp,' ',NYtmp,' ',EYtmp,' ',EPYtmp,' ',
-		LENGTHtmp,' ',TYPEtmp,' ',TYPENAMEtmp,' ',ANGLEtmp,' ',K1tmp,' ',ROTATEtmp,' ',DXtmp,' ',DYtmp
+		AXtmp,' ',BXtmp,' ',NXtmp,' ',EXtmp,' ',EPXtmp,' ',AYtmp,' ',BYtmp,' ',NYtmp,' ',
+		EYtmp,' ',EPYtmp,' ',LENGTHtmp,' ',TYPEtmp,' ',TYPENAMEtmp,' ',ANGLEtmp,' ',
+		K0tmp,' ',K1tmp,' ',ROTATEtmp,' ',DXtmp,' ',DYtmp
 	]];
 	,
 	{i,1,Length[NAME],1}
